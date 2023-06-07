@@ -21,6 +21,14 @@ struct WaveFile {
     data: Vec<u8>,
 }
 
+fn read_array(cursor: &mut Cursor<Vec<u8>>, size: usize) -> [u8; 4] {
+    let mut arr = [0; 4];
+    for i in 0..size {
+        arr[i] = cursor.read_u8().unwrap();
+    }
+    arr
+}
+
 fn main() {
     let mut f = File::open("C:/Users/tabu1/OneDrive/Rust Projects/audio_compressor/src/test.wav").unwrap();
     let mut buffer = Vec::new();
@@ -79,5 +87,6 @@ fn main() {
 }
 
 fn compress(inout: WaveFile) {
+    todo!()
     // do something with input.data
 }
