@@ -1,0 +1,42 @@
+rms(source, length) =>
+    math.sqrt(math.sum(math.pow(source, 2), length) / length)
+
+compressor(float signal, float ratio = 1.5, float threshold = 50, int lookback = 100, bool use_rms = true, int rms_window = 500, string knee_type = "soft") => 
+    abs_signal = math.abs(signal) 
+
+    signal_rms = rms(abs_signal, rms_window)
+
+    signal_percentile = ta.percentile_nearest_rank(abs_signal, lookback, threshold)
+    signal_percentile_rms = ta.percentile_nearest_rank(signal_rms, lookback, threshold)
+    if use_rms
+        if knee_type == "hard"
+            if abs_signal <= signal_percentile_rms
+                out = signal
+                out
+            else
+                out = signal_percentile_rms + (signal - signal_percentile_rms) / ratio
+                out
+        else
+            if (abs_signal <= signal_percentile_rms) or signal_percentile_rms == 0
+                out = signal
+                out
+            else
+                soft_knee_ratio = 1 + ((ratio - 1) * (abs_signal - signal_percentile_rms)) / (abs_signal)
+                out = signal / soft_knee_ratio
+                out
+    else
+        if knee_type == "hard"
+            if abs_signal <= signal_percentile
+                out = signal
+                out
+            else
+                out = signal_percentile + (signal - signal_percentile) / ratio
+                out
+        else
+            if (abs_signal <= signal_percentile) or signal_percentile == 0
+                out = signal
+                out
+            else
+                soft_knee_ratio = 1 + ((ratio - 1) * (abs_signal - signal_percentile)) / (abs_signal)
+                out = signal / soft_knee_ratio
+                out
